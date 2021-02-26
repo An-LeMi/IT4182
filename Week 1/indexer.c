@@ -19,6 +19,17 @@ void printResult(TreeType tree, FILE *fr){
   	}
 }
 
+int checkStop(char stop[STOP][81], char *word){
+	int checkStop = 0;
+	for(int i = 0; i < STOP; i++){
+		if (strcmp(stop[i], word) == 0){
+			checkStop = 1;
+			break;
+		}
+	}
+	return checkStop;
+}
+
 
 int main() {
 	FILE *fread, *fstop;
@@ -76,7 +87,7 @@ int main() {
 			if((cache[0] >= 'A' && cache[0] <= 'Z') && checkDot == 0)
 			 	cache[0] = '\0';
 
-			if(cache[0] != '\0'){
+			if(cache[0] != '\0' && checkStop(stop,cache) == 0){
 				for(int i = 0; i < numCache; i++) {
 					cache[i] = tolower(cache[i]);
 				}
