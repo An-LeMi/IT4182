@@ -65,7 +65,7 @@ int main() {
 		if (feof(fread))
 			break;
 
-		if (a == '\n' || (a == '\n' && a == '\r'))
+		if (a == '\n')
 			numLine++;
 
 		if (a == '.')
