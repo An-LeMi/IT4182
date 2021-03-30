@@ -7,6 +7,7 @@
 #define STOP 17
 #define MAX 100000
 
+
 void printResult(TreeType tree, FILE *fr){
 	if(tree != NULL){
     	printResult(tree->left, fr);
@@ -19,12 +20,14 @@ void printResult(TreeType tree, FILE *fr){
   	}
 }
 
+
 int checkStop(char stop[STOP][81], char *word){
 	int checkStop = 0;
 	for(int i = 0; i < STOP; i++){
 		if (strcmp(stop[i], word) == 0){
 			checkStop = 1;
 			break;
+			
 		}
 	}
 	return checkStop;
