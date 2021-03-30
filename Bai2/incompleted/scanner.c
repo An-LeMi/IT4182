@@ -56,7 +56,7 @@ Token* readIdentKeyword(void) {
 
   TokenType tokenType = checkKeyword(token->string);
 
-  if(KW_PROGRAM <= tokenType && tokenType <= KW_TO){
+  if(KW_PROGRAM <= tokenType && tokenType <= KW_STRING){
       token->tokenType = tokenType; 
   }
   if(token->tokenType != TK_NONE && token->tokenType != TK_IDENT && token->tokenType != TK_NUMBER && token->tokenType != TK_CHAR && token->tokenType != TK_EOF){
@@ -74,9 +74,41 @@ Token* readNumber(void) {
     count++;
     readChar();
   }
+  if (charCodes[currentChar] == CHAR_PERIOD){
+    token->string[count] = (char)currentChar;
+    token->tokenType = TK_FLOAT;
+    count++;
+    readChar();
+    while (charCodes[currentChar] == CHAR_DIGIT) {
+      token->string[count] = (char)currentChar;
+      count++;
+      readChar();
+    } 
+  }
 
   token->string[count] = '\0';
   token->value = atoi(token->string);
+  return token;
+}
+
+Token *readFloat (int count){
+  Token *token = makeToken(TK_FLOAT, lineNo, colNo);
+  while(charCodes[currentChar] == CHAR_DIGIT){
+    token->string[count] = (char)currentChar;
+    count++;
+    readChar();
+  }
+  if (charCodes[currentChar] == CHAR_PERIOD){
+    token->string[count] = (char)currentChar;
+    count++;
+    readChar();
+    while (charCodes[currentChar] == CHAR_DIGIT) {
+      token->string[count] = (char)currentChar;
+      count++;
+      readChar();
+    } 
+  }
+  token->string[count] = '\0';
   return token;
 }
 
@@ -184,6 +216,19 @@ Token* getToken(void) {
       readChar();
       return makeToken(SB_RSEL, line, col);
     }
+    if (currentChar != EOF && charCodes[currentChar] == CHAR_DIGIT) {
+      token = makeToken(TK_FLOAT, line, col);
+      token->string[0] = '0';
+      token->string[1] = '.';
+      int count = 2;
+      while (charCodes[currentChar] == CHAR_DIGIT) {
+        token->string[count] = (char)currentChar;
+        count++;
+        readChar();
+      }
+      token->string[count] = '\0';
+      return token;
+    }
     return makeToken(SB_PERIOD, line, col);
   case CHAR_COLON:
     line = lineNo;
@@ -216,6 +261,31 @@ Token* getToken(void) {
     token = makeToken(SB_RPAR, lineNo, colNo);
     readChar();
     return token;
+  case CHAR_DOUBLEQUOTES:
+    token = makeToken(TK_STRING, lineNo, colNo);
+    token->string[0] = '\'';
+    int count = 1;
+    readChar();
+    while(charCodes[currentChar] == CHAR_LETTER || charCodes[currentChar] == CHAR_DIGIT){
+      if(count > MAX_IDENT_LEN){
+        error(ERR_IDENTTOOLONG, lineNo, colNo);
+        return NULL;
+      }
+      token->string[count] = (char) currentChar;
+      count++;
+      readChar();
+    }
+    if (charCodes[currentChar] != CHAR_DOUBLEQUOTES){
+      error(ERR_INVALIDSYMBOL, lineNo, colNo);
+      return NULL;
+    }
+    else {
+      token->string[count] = '\'';
+      count++;
+    }
+    token->string[count] = '\0';
+    readChar();
+    return token;
   default:
     token = makeToken(TK_NONE, lineNo, colNo);
     error(ERR_INVALIDSYMBOL, lineNo, colNo);
@@ -237,6 +307,8 @@ void printToken(Token *token) {
   case TK_NUMBER: printf("TK_NUMBER(%s)\n", token->string); break;
   case TK_CHAR: printf("TK_CHAR(\'%s\')\n", token->string); break;
   case TK_EOF: printf("TK_EOF\n"); break;
+  case TK_FLOAT: printf("TK_FLOAT(%s)\n", token->string); break;
+  case TK_STRING: printf("TK_STRING(%s)\n", token->string); break;
 
   case KW_PROGRAM: printf("KW_PROGRAM\n"); break;
   case KW_CONST: printf("KW_CONST\n"); break;
@@ -258,6 +330,8 @@ void printToken(Token *token) {
   case KW_DO: printf("KW_DO\n"); break;
   case KW_FOR: printf("KW_FOR\n"); break;
   case KW_TO: printf("KW_TO\n"); break;
+  case KW_FLOAT: printf("KW_FLOAT\n"); break;
+  case KW_STRING: printf("KW_STRING\n"); break;
 
   case SB_SEMICOLON: printf("SB_SEMICOLON\n"); break;
   case SB_COLON: printf("SB_COLON\n"); break;
