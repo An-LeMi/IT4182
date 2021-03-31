@@ -1,0 +1,28 @@
+PROGRAM EXCERCISE;
+
+VAR A : ARRAY(. 10 .) OF INTEGER;
+    I : INTEGER;
+    J : INTEGER;
+    MIN : INTEGER;
+    CHECK : INTEGER;
+     
+BEGIN
+    CHECK := 0;
+    FOR I := 0 TO 9 DO
+        A(.I.) := READI;
+
+    MIN := A(.1.);
+    FOR I := 0 TO 9 DO 
+        IF A(.I.) < MIN THEN MIN := A(.I.);
+    CALL WRITEI(MIN);
+    CALL WRITELN;
+    
+    FOR I := 0 TO 9 DO
+        BEGIN
+        FOR J:= I+1 TO 9 DO
+            If A(.I.) = A(.J.) Then CHECK := 1;
+        END;
+    
+    IF CHECK = 1 THEN   
+        CALL WRITEC('Y');
+END.
