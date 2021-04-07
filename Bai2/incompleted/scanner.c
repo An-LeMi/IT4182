@@ -83,6 +83,10 @@ Token* readNumber(void) {
       token->string[count] = (char)currentChar;
       count++;
       readChar();
+    }
+    if (charCodes[currentChar] == CHAR_PERIOD) {
+      error(ERR_INVALIDSYMBOL,lineNo,colNo);
+      return NULL;
     } 
   }
 
@@ -91,26 +95,26 @@ Token* readNumber(void) {
   return token;
 }
 
-Token *readFloat (int count){
-  Token *token = makeToken(TK_FLOAT, lineNo, colNo);
-  while(charCodes[currentChar] == CHAR_DIGIT){
-    token->string[count] = (char)currentChar;
-    count++;
-    readChar();
-  }
-  if (charCodes[currentChar] == CHAR_PERIOD){
-    token->string[count] = (char)currentChar;
-    count++;
-    readChar();
-    while (charCodes[currentChar] == CHAR_DIGIT) {
-      token->string[count] = (char)currentChar;
-      count++;
-      readChar();
-    } 
-  }
-  token->string[count] = '\0';
-  return token;
-}
+// Token *readFloat (int count){
+//   Token *token = makeToken(TK_FLOAT, lineNo, colNo);
+//   while(charCodes[currentChar] == CHAR_DIGIT){
+//     token->string[count] = (char)currentChar;
+//     count++;
+//     readChar();
+//   }
+//   if (charCodes[currentChar] == CHAR_PERIOD){
+//     token->string[count] = (char)currentChar;
+//     count++;
+//     readChar();
+//     while (charCodes[currentChar] == CHAR_DIGIT) {
+//       token->string[count] = (char)currentChar;
+//       count++;
+//       readChar();
+//     } 
+//   }
+//   token->string[count] = '\0';
+//   return token;
+// }
 
 Token* readConstChar(void) {
   // TODO
@@ -226,6 +230,10 @@ Token* getToken(void) {
         count++;
         readChar();
       }
+      if (charCodes[currentChar] == CHAR_PERIOD) {
+        error(ERR_INVALIDSYMBOL,lineNo,colNo);
+        return NULL;
+      } 
       token->string[count] = '\0';
       return token;
     }
@@ -269,6 +277,10 @@ Token* getToken(void) {
     while(charCodes[currentChar] == CHAR_LETTER || charCodes[currentChar] == CHAR_DIGIT){
       if(count > MAX_IDENT_LEN){
         error(ERR_IDENTTOOLONG, lineNo, colNo);
+        return NULL;
+      }
+      if(currentChar == EOF){
+        error(ERR_INVALIDSYMBOL, lineNo, colNo);
         return NULL;
       }
       token->string[count] = (char) currentChar;
