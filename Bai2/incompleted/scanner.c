@@ -18,7 +18,8 @@ extern int colNo;
 extern int currentChar;
 
 extern CharCode charCodes[];
-
+int checkRSEL = 0;
+int lineNum = 0, colNum = 0;
 /***************************************************************/
 
 void skipBlank() {
@@ -75,10 +76,19 @@ Token* readNumber(void) {
     readChar();
   }
   if (charCodes[currentChar] == CHAR_PERIOD){
+    lineNum = lineNo; 
+    colNum = colNo;
     token->string[count] = (char)currentChar;
     token->tokenType = TK_FLOAT;
     count++;
     readChar();
+    if (currentChar != EOF && charCodes[currentChar] == CHAR_RPAR){
+      checkRSEL = 1;
+      token->tokenType = TK_NUMBER;
+      token->string[count-1] = '\0';
+      token->value = atoi(token->string);
+      return token;
+    }
     while (charCodes[currentChar] == CHAR_DIGIT) {
       token->string[count] = (char)currentChar;
       count++;
@@ -155,6 +165,13 @@ Token* getToken(void) {
 
   if (currentChar == EOF) 
     return makeToken(TK_EOF, lineNo, colNo);
+
+  if(checkRSEL == 1){
+    checkRSEL = 0;
+    token = makeToken(SB_RSEL, lineNum, colNum);
+    readChar();
+    return token;
+  }
 
   switch (charCodes[currentChar]) {
   case CHAR_SPACE: skipBlank(); return getToken();
@@ -258,6 +275,7 @@ Token* getToken(void) {
     col = colNo;
     readChar();
     if (currentChar != EOF && charCodes[currentChar] == CHAR_PERIOD){
+      readChar();
       return makeToken(SB_LSEL, line, col);
     }
     if (currentChar != EOF && charCodes[currentChar] == CHAR_TIMES){
