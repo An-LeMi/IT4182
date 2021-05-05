@@ -617,12 +617,10 @@ void compileFactor(void)
   {
   case TK_IDENT:
     eat(TK_IDENT);
-    if (lookAhead->tokenType == SB_LSEL)
-    {
+    if (lookAhead->tokenType == SB_LSEL) {
       compileIndexes();
     }
-    else
-    {
+    else{
       compileArguments();
     }
     break;
@@ -636,6 +634,9 @@ void compileFactor(void)
     eat(SB_LPAR);
     compileExpression();
     eat(SB_RPAR);
+    break;
+  case TK_STRING:
+    eat(TK_STRING);
     break;
   default:
     error(ERR_INVALIDFACTOR, lookAhead->lineNo, lookAhead->colNo);

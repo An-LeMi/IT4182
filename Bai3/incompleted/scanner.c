@@ -56,7 +56,8 @@ Token* readIdentKeyword(void) {
 
   while ((currentChar != EOF) && 
    ((charCodes[currentChar] == CHAR_LETTER) || (charCodes[currentChar] == CHAR_DIGIT))) {
-    if (count <= MAX_IDENT_LEN) token->string[count++] = (char)currentChar;
+    if (count <= MAX_IDENT_LEN) 
+      token->string[count++] = (char)currentChar;
     readChar();
   }
 

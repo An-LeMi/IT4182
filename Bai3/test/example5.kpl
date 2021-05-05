@@ -1,0 +1,17 @@
+PROGRAM Example5; (* Example 5 *)
+VAR D:STRING;
+    I : INTEGER;
+BEGIN
+D:= "hello";
+I:= 1;
+K:= I % 2 * I;
+DO 
+   WHILE I > 2 DO
+   	BEGIN
+   		DO X := 0 WHILE I > 2;
+   		
+    		I := I + 1;
+
+    	END
+WHILE I < 10;
+END. (* Example 5 *)
