@@ -98,13 +98,11 @@ ConstantValue* duplicateConstantValue(ConstantValue* v) {
   // TODO
   ConstantValue *c = (ConstantValue*)malloc(sizeof(ConstantValue));
   c->type = v->type;
-  switch (v->type){
-  case TP_CHAR:
+  if(v->type == TP_CHAR)
     c->charValue = v->charValue;
-    break;
-  case TP_INT:
+
+  if (v->type == TP_INT){
     c->intValue = v->intValue;
-    break;
   }
   return c;
 }
