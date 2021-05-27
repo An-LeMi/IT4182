@@ -68,7 +68,6 @@ void compileBlock(void) {
 
       eat(SB_SEMICOLON);
     } while (lookAhead->tokenType == TK_IDENT);
-
     compileBlock2();
   } 
   else compileBlock2();
@@ -95,7 +94,6 @@ void compileBlock2(void) {
 
       eat(SB_SEMICOLON);
     } while (lookAhead->tokenType == TK_IDENT);
-
     compileBlock3();
   } 
   else compileBlock3();
@@ -121,7 +119,6 @@ void compileBlock3(void) {
 
       eat(SB_SEMICOLON);
     } while (lookAhead->tokenType == TK_IDENT);
-
     compileBlock4();
   } 
   else compileBlock4();
@@ -181,7 +178,7 @@ void compileProcDecl(void) {
   // Add procObj to current Object List
   declareObject(procObj);
   // enter procedure block
-  enterBlock(procObj->progAttrs->scope);
+  enterBlock(procObj->procAttrs->scope);
 
   compileParams();
   eat(SB_SEMICOLON);
@@ -237,14 +234,14 @@ ConstantValue* compileConstant(void) {
   case SB_MINUS:
     eat(SB_MINUS);
     constValue = compileConstant2();
-    constValue->intValue = -constValue->intValue;
+    constValue->intValue = - constValue->intValue;
     break;
   case TK_CHAR:
     eat(TK_CHAR);
     constValue = makeCharConstant(currentToken->string[0]);
     break;
   default:
-    compileConstant2();
+    constValue = compileConstant2();
     break;
   }
   return constValue;
@@ -365,31 +362,32 @@ void compileParams(void) {
 void compileParam(void) {
   // TODO: create and declare a parameter
   Object *paramObj;
-  enum ParamKind kind;
+  // enum ParamKind kind;
   Type *type;
+  
   switch (lookAhead->tokenType) {
-  case TK_IDENT:
-    kind = PARAM_VALUE;
-    eat(TK_IDENT);
-    paramObj = createParameterObject(currentToken->string, kind, symtab->currentScope->owner);
-    eat(SB_COLON);
-    type = compileBasicType();
-    paramObj->paramAttrs->type = type;
-    declareObject(paramObj);
-    break;
-  case KW_VAR:
-    kind = PARAM_REFERENCE;
-    eat(KW_VAR);
-    eat(TK_IDENT);
-    paramObj = createParameterObject(currentToken->string, kind, symtab->currentScope->owner);
-    eat(SB_COLON);
-    type = compileBasicType();
-    paramObj->paramAttrs->type = type;
-    declareObject(paramObj);
-    break;
-  default:
-    error(ERR_INVALID_PARAMETER, lookAhead->lineNo, lookAhead->colNo);
-    break;
+    case TK_IDENT:
+      // kind = PARAM_VALUE;
+      eat(TK_IDENT);
+      paramObj = createParameterObject(currentToken->string, PARAM_VALUE, symtab->currentScope->owner);
+      eat(SB_COLON);
+      type = compileBasicType();
+      paramObj->paramAttrs->type = type;
+      declareObject(paramObj);
+      break;
+    case KW_VAR:
+      eat(KW_VAR);
+      // kind = PARAM_REFERENCE;  
+      eat(TK_IDENT);
+      paramObj = createParameterObject(currentToken->string, PARAM_REFERENCE, symtab->currentScope->owner);
+      eat(SB_COLON);
+      type = compileBasicType();
+      paramObj->paramAttrs->type = type;
+      declareObject(paramObj);
+      break;
+    default:
+      error(ERR_INVALID_PARAMETER, lookAhead->lineNo, lookAhead->colNo);
+      break;
   }
 }
 
