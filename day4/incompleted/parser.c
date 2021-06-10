@@ -417,6 +417,7 @@ Type* compileLValue(void) {
   eat(TK_IDENT);
   // check if the identifier is a function identifier, or a variable identifier, or a parameter  
   var = checkDeclaredLValueIdent(currentToken->string);
+  // printf("Day la value %s\n", currentToken->string);
   if (var->kind == OBJ_VARIABLE){
     if (var->varAttrs->type->typeClass == TP_ARRAY){
       varType = compileIndexes(var->varAttrs->type);
@@ -439,6 +440,7 @@ void compileAssignSt(void) {
   // TODO: parse the assignment and check type consistency
   Type *t1 = NULL;
   Type *t2 = NULL;
+
   t1 = compileLValue();
   eat(SB_ASSIGN);
   t2 = compileExpression();
@@ -515,9 +517,10 @@ void compileArgument(Object* param) {
     type = compileLValue();
     checkTypeEquality(type, param->paramAttrs->type);
   }
-
-  type = compileExpression();
-  checkTypeEquality(type, param->paramAttrs->type);
+  else {
+    type = compileExpression();
+    checkTypeEquality(type, param->paramAttrs->type);
+  }
 }
 
 void compileArguments(ObjectNode* paramList) {
@@ -600,7 +603,8 @@ void compileCondition(void) {
     error(ERR_INVALID_COMPARATOR, lookAhead->lineNo, lookAhead->colNo);
   }
 
-  compileExpression();
+  t2 = compileExpression();
+  checkTypeEquality(t1, t2);
 }
 
 Type* compileExpression(void) {
@@ -751,6 +755,7 @@ Type* compileFactor(void) {
     break;
   case TK_IDENT:
     eat(TK_IDENT);
+    // printf("day la ident, %s\n", currentToken->string);
     // check if the identifier is declared
     obj = checkDeclaredIdent(currentToken->string);
 
@@ -781,7 +786,7 @@ Type* compileFactor(void) {
       type = obj->funcAttrs->returnType;
       break;
     default: 
-      error(ERR_INVALID_FACTOR,currentToken->lineNo, currentToken->colNo);
+      error(ERR_INVALID_FACTOR, currentToken->lineNo, currentToken->colNo);
       break;
     }
     break;
@@ -799,11 +804,12 @@ Type* compileIndexes(Type* arrayType) {
     eat(SB_LSEL);
     type = compileExpression();
     checkIntType(type);
-    checkArrayType(type);
-    // compileExpression();
+    checkArrayType(arrayType);
     arrayType = arrayType->elementType;
     eat(SB_RSEL);
   }
+  checkBasicType(arrayType);
+  return arrayType;
 }
 
 int compile(char *fileName) {
