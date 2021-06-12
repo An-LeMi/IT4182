@@ -18,6 +18,8 @@ Token *lookAhead;
 
 extern Type* intType;
 extern Type* charType;
+extern Type* doubleType;
+extern Type* stringType;
 extern SymTab* symtab;
 
 void scan(void) {
@@ -217,6 +219,14 @@ ConstantValue* compileUnsignedConstant(void) {
     eat(TK_CHAR);
     constValue = makeCharConstant(currentToken->string[0]);
     break;
+  case TK_DOUBLE:
+    eat(TK_DOUBLE);
+    constValue = makeDoubleConstant(atof(currentToken->string));
+    break;
+  case TK_STRING:
+    eat(TK_STRING);
+    constValue = makeStringConstant(currentToken->string);
+    break;
   default:
     error(ERR_INVALID_CONSTANT, lookAhead->lineNo, lookAhead->colNo);
     break;
@@ -235,11 +245,17 @@ ConstantValue* compileConstant(void) {
   case SB_MINUS:
     eat(SB_MINUS);
     constValue = compileConstant2();
-    constValue->intValue = - constValue->intValue;
+    if (constValue->type == TP_INT)
+      constValue->intValue = - constValue->intValue;
+    else constValue->doubleValue = - constValue->doubleValue;
     break;
   case TK_CHAR:
     eat(TK_CHAR);
     constValue = makeCharConstant(currentToken->string[0]);
+    break;
+  case TK_STRING:
+    eat(TK_STRING);
+    constValue = makeStringConstant(currentToken->string);
     break;
   default:
     constValue = compileConstant2();
@@ -257,10 +273,16 @@ ConstantValue* compileConstant2(void) {
     eat(TK_NUMBER);
     constValue = makeIntConstant(currentToken->value);
     break;
+  case TK_DOUBLE:
+    eat(TK_DOUBLE);
+    constValue = makeDoubleConstant(atof(currentToken->string));
+    break;
   case TK_IDENT:
     eat(TK_IDENT);
     obj = checkDeclaredConstant(currentToken->string);
     if (obj->constAttrs->value->type == TP_INT)
+      constValue = duplicateConstantValue(obj->constAttrs->value);
+    else if (obj->constAttrs->value->type == TP_DOUBLE)
       constValue = duplicateConstantValue(obj->constAttrs->value);
     else
       error(ERR_UNDECLARED_INT_CONSTANT,currentToken->lineNo, currentToken->colNo);
@@ -286,6 +308,14 @@ Type* compileType(void) {
   case KW_CHAR: 
     eat(KW_CHAR); 
     type = makeCharType();
+    break;
+  case KW_DOUBLE:
+    eat(KW_DOUBLE);
+    type = makeDoubleType();
+    break;
+  case KW_STRING:
+    eat(KW_STRING);
+    type = makeStringType();
     break;
   case KW_ARRAY:
     eat(KW_ARRAY);
@@ -323,6 +353,14 @@ Type* compileBasicType(void) {
     eat(KW_CHAR); 
     type = makeCharType();
     break;
+  case KW_DOUBLE:
+    eat(KW_DOUBLE);
+    type = makeDoubleType();
+    break; 
+  case KW_STRING:
+    eat(KW_STRING);
+    type = makeStringType();
+    break;   
   default:
     error(ERR_INVALID_BASICTYPE, lookAhead->lineNo, lookAhead->colNo);
     break;
@@ -614,12 +652,12 @@ Type* compileExpression(void) {
   case SB_PLUS:
     eat(SB_PLUS);
     type = compileExpression2();
-    checkIntType(type);
+    checkNumberType(type);
     break;
   case SB_MINUS:
     eat(SB_MINUS);
     type = compileExpression2();
-    checkIntType(type);
+    checkNumberType(type);
     break;
   default:
     type = compileExpression2();
@@ -649,19 +687,19 @@ Type *compileExpression3(void) {
   case SB_PLUS:
     eat(SB_PLUS);
     type1 = compileTerm();
-    checkIntType(type1);
+    checkNumberType(type1);
     type2 = compileExpression3();
     if (type2 != NULL)
-      checkIntType(type2);
+      checkNumberType(type2);
     return type1;
     break;
   case SB_MINUS:
     eat(SB_MINUS);
     type1 = compileTerm();
-    checkIntType(type1);
+    checkNumberType(type1);
     type2 = compileExpression3();
     if (type2 != NULL)
-      checkIntType(type2);
+      checkNumberType(type2);
     return type1;
     break;
     // check the FOLLOW set
@@ -705,13 +743,13 @@ void compileTerm2(void) {
   case SB_TIMES:
     eat(SB_TIMES);
     type = compileFactor();
-    checkIntType(type);
+    checkNumberType(type);
     compileTerm2();
     break;
   case SB_SLASH:
     eat(SB_SLASH);
     type = compileFactor();
-    checkIntType(type);
+    checkNumberType(type);
     compileTerm2();
     break;
     // check the FOLLOW set
@@ -753,6 +791,14 @@ Type* compileFactor(void) {
     eat(TK_CHAR);
     type = makeCharType();
     break;
+  case TK_DOUBLE:
+    eat(TK_DOUBLE);
+    type = makeDoubleType();
+    break;
+  case TK_STRING:
+    eat(TK_STRING);
+    type = makeStringType();
+    break;
   case TK_IDENT:
     eat(TK_IDENT);
     // printf("day la ident, %s\n", currentToken->string);
@@ -767,6 +813,12 @@ Type* compileFactor(void) {
         break;
       case TP_CHAR:
         type = makeCharType();
+        break;
+      case TP_DOUBLE:
+        type = makeDoubleType();
+        break;
+      case TP_STRING:
+        type = makeStringType();
         break;
       default:
         break;

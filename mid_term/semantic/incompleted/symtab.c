@@ -18,6 +18,8 @@ void freeReferenceList(ObjectNode *objList);
 SymTab* symtab;
 Type* intType;
 Type* charType;
+Type* doubleType;
+Type* stringType;
 
 /******************* Type utilities ******************************/
 
@@ -32,6 +34,19 @@ Type* makeCharType(void) {
   type->typeClass = TP_CHAR;
   return type;
 }
+
+Type* makeDoubleType(void){
+  Type* type = (Type*) malloc(sizeof(Type));
+  type->typeClass = TP_DOUBLE;
+  return type;
+} 
+
+Type* makeStringType(void){
+  Type* type = (Type*) malloc(sizeof(Type));
+  type->typeClass = TP_STRING;
+  return type;
+} 
+
 
 Type* makeArrayType(int arraySize, Type* elementType) {
   Type* type = (Type*) malloc(sizeof(Type));
@@ -55,16 +70,22 @@ int compareType(Type* type1, Type* type2) {
   if (type1->typeClass == type2->typeClass) {
     if (type1->typeClass == TP_ARRAY) {
       if (type1->arraySize == type2->arraySize)
-	return compareType(type1->elementType, type2->elementType);
+	      return compareType(type1->elementType, type2->elementType);
       else return 0;
     } else return 1;
-  } else return 0;
+  }  
+  else if (type1->typeClass == TP_DOUBLE && type2->typeClass == TP_INT) {
+    return 1;
+  } 
+  else return 0;
 }
 
 void freeType(Type* type) {
   switch (type->typeClass) {
   case TP_INT:
   case TP_CHAR:
+  case TP_DOUBLE:
+  case TP_STRING:
     free(type);
     break;
   case TP_ARRAY:
@@ -90,13 +111,34 @@ ConstantValue* makeCharConstant(char ch) {
   return value;
 }
 
+ConstantValue* makeDoubleConstant(double db){
+  ConstantValue* value = (ConstantValue*) malloc(sizeof(ConstantValue));
+  value->type = TP_DOUBLE;
+  value->doubleValue = db;
+  return value;
+}
+
+ConstantValue* makeStringConstant(char* str){
+  ConstantValue* value = (ConstantValue*) malloc(sizeof(ConstantValue));
+  value->type = TP_STRING;
+  value->stringValue = (char*)malloc(MAX_IDENT_LEN*sizeof(char));
+  strcpy(value->stringValue, str);
+  return value;
+}
+
 ConstantValue* duplicateConstantValue(ConstantValue* v) {
   ConstantValue* value = (ConstantValue*) malloc(sizeof(ConstantValue));
   value->type = v->type;
   if (v->type == TP_INT) 
     value->intValue = v->intValue;
-  else
+  else if (v->type == TP_CHAR)
     value->charValue = v->charValue;
+  else if (v->type == TP_DOUBLE)
+    value->doubleValue = v->doubleValue;
+  else{
+    value->stringValue = (char*)malloc(MAX_IDENT_LEN*sizeof(char));
+    strcpy(value->stringValue, v->stringValue);
+  }
   return value;
 }
 
@@ -278,6 +320,14 @@ void initSymTab(void) {
   obj->funcAttrs->returnType = makeIntType();
   addObject(&(symtab->globalObjectList), obj);
 
+  obj = createFunctionObject("READD");
+  obj->funcAttrs->returnType = makeDoubleType();
+  addObject(&(symtab->globalObjectList), obj);  
+
+  obj = createFunctionObject("READS");
+  obj->funcAttrs->returnType = makeStringType();
+  addObject(&(symtab->globalObjectList), obj);
+
   obj = createProcedureObject("WRITEI");
   param = createParameterObject("i", PARAM_VALUE, obj);
   param->paramAttrs->type = makeIntType();
@@ -290,11 +340,25 @@ void initSymTab(void) {
   addObject(&(obj->procAttrs->paramList),param);
   addObject(&(symtab->globalObjectList), obj);
 
+  obj = createProcedureObject("WRITED");
+  param = createParameterObject("d", PARAM_VALUE, obj);
+  param->paramAttrs->type = makeDoubleType();
+  addObject(&(obj->procAttrs->paramList),param);
+  addObject(&(symtab->globalObjectList), obj);
+
+  obj = createProcedureObject("WRITES");
+  param = createParameterObject("str", PARAM_VALUE, obj);
+  param->paramAttrs->type = makeStringType();
+  addObject(&(obj->procAttrs->paramList),param);
+  addObject(&(symtab->globalObjectList), obj);
+
   obj = createProcedureObject("WRITELN");
   addObject(&(symtab->globalObjectList), obj);
 
   intType = makeIntType();
   charType = makeCharType();
+  doubleType = makeDoubleType();
+  stringType = makeStringType();
 }
 
 void cleanSymTab(void) {
@@ -303,6 +367,8 @@ void cleanSymTab(void) {
   free(symtab);
   freeType(intType);
   freeType(charType);
+  freeType(doubleType);
+  freeType(stringType);
 }
 
 void enterBlock(Scope* scope) {

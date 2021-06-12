@@ -125,9 +125,32 @@ void checkCharType(Type* type) {
   error(ERR_TYPE_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
 }
 
+void checkDoubleType(Type* type) {
+  // TODO
+  if (type != NULL && type->typeClass == TP_DOUBLE){
+    return;
+  }
+  error(ERR_TYPE_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
+}
+
+void checkNumberType(Type* type) {
+  // TODO
+  if ((type != NULL) && ((type->typeClass == TP_DOUBLE) || (type->typeClass == TP_INT)))
+    return ;
+  else error (ERR_TYPE_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
+}
+
+void checkStringType(Type* type) {
+  // TODO
+  if (type != NULL && type->typeClass == TP_STRING){
+    return;
+  }
+  error(ERR_TYPE_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
+}
+
 void checkBasicType(Type* type) {
   // TODO
-  if((type != NULL) && ((type->typeClass == TP_CHAR) || (type->typeClass == TP_INT))) {
+  if((type != NULL) && ((type->typeClass == TP_CHAR) || (type->typeClass == TP_INT) || (type->typeClass == TP_DOUBLE) || (type->typeClass == TP_STRING))) {
     return;
   }
   error(ERR_TYPE_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);

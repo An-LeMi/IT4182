@@ -20,7 +20,8 @@ extern int colNo;
 extern int currentChar;
 
 extern CharCode charCodes[];
-
+int checkRSEL = 0;
+int lineNum = 0, colNum = 0;
 /***************************************************************/
 
 void skipBlank() {
@@ -104,7 +105,7 @@ Token* readNumber(void) {
       readChar();
     }
     if (charCodes[currentChar] == CHAR_PERIOD) {
-      error(ERR_INVALIDSYMBOL,lineNo,colNo);
+      error(ERR_INVALID_SYMBOL,lineNo,colNo);
       return NULL;
     } 
   }
@@ -151,11 +152,11 @@ Token *readString(void){
   readChar();
   while(1){
     if(count > MAX_IDENT_LEN){
-      error(ERR_IDENTTOOLONG, lineNo, colNo);
+      error(ERR_IDENT_TOO_LONG, lineNo, colNo);
       return NULL;
     }
     if(currentChar == EOF){
-      error(ERR_INVALIDSYMBOL, lineNo, colNo);
+      error(ERR_INVALID_SYMBOL, lineNo, colNo);
       return NULL;
     }
     if(charCodes[currentChar] == CHAR_DOUBLEQUOTES) 
@@ -165,7 +166,7 @@ Token *readString(void){
     readChar();
   }
   if (charCodes[currentChar] != CHAR_DOUBLEQUOTES){
-    error(ERR_INVALIDSYMBOL, lineNo, colNo);
+    error(ERR_INVALID_SYMBOL, lineNo, colNo);
     return NULL;
   }
   else {
@@ -183,6 +184,13 @@ Token* getToken(void) {
 
   if (currentChar == EOF) 
     return makeToken(TK_EOF, lineNo, colNo);
+
+  if(checkRSEL == 1){
+    checkRSEL = 0;
+    token = makeToken(SB_RSEL, lineNum, colNum);
+    readChar();
+    return token;
+  }  
 
   switch (charCodes[currentChar]) {
   case CHAR_SPACE: skipBlank(); return getToken();
@@ -255,7 +263,7 @@ Token* getToken(void) {
       return makeToken(SB_RSEL, ln, cn);
     } //else return makeToken(SB_PERIOD, ln, cn);
     if (currentChar != EOF && charCodes[currentChar] == CHAR_DIGIT) {
-      token = makeToken(TK_DOUBLE, line, col);
+      token = makeToken(TK_DOUBLE, ln, cn);
       token->string[0] = '0';
       token->string[1] = '.';
       int count = 2;
@@ -265,13 +273,13 @@ Token* getToken(void) {
         readChar();
       }
       if (charCodes[currentChar] == CHAR_PERIOD) {
-        error(ERR_INVALIDSYMBOL,lineNo,colNo);
+        error(ERR_INVALID_SYMBOL, lineNo, colNo);
         return NULL;
       } 
       token->string[count] = '\0';
       return token;
     }
-    return makeToken(SB_PERIOD, line, col);
+    return makeToken(SB_PERIOD, ln, cn);
   case CHAR_SEMICOLON:
     token = makeToken(SB_SEMICOLON, lineNo, colNo);
     readChar(); 

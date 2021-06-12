@@ -65,6 +65,8 @@ char *tokenToString(TokenType tokenType) {
   case TK_NONE: return "None";
   case TK_IDENT: return "an identification";
   case TK_NUMBER: return "a number";
+  case TK_DOUBLE: return "a double";
+  case TK_STRING: return "a string";
   case TK_CHAR: return "a constant char";
   case TK_EOF: return "end of file";
 
@@ -88,6 +90,8 @@ char *tokenToString(TokenType tokenType) {
   case KW_DO: return "keyword DO";
   case KW_FOR: return "keyword FOR";
   case KW_TO: return "keyword TO";
+  case KW_STRING: return "keyword STRING";
+  case KW_DOUBLE: return "keyword DOUBLE";
 
   case SB_SEMICOLON: return "\';\'";
   case SB_COLON: return "\':\'";
