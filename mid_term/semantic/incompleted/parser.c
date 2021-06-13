@@ -432,6 +432,9 @@ void compileStatement(void) {
   case KW_WHILE:
     compileWhileSt();
     break;
+  case KW_DO:
+    compileDoWhileSt();
+    break;
   case KW_FOR:
     compileForSt();
     break;
@@ -744,6 +747,7 @@ Type *compileExpression3(void) {
     // check the FOLLOW set
   case KW_TO:
   case KW_DO:
+  case KW_WHILE:
   case SB_RPAR:
   case SB_COMMA:
   case SB_EQ:
@@ -797,6 +801,7 @@ void compileTerm2(void) {
   case SB_MINUS:
   case KW_TO:
   case KW_DO:
+  case KW_WHILE:
   case SB_RPAR:
   case SB_COMMA:
   case SB_EQ:

@@ -10,6 +10,8 @@ Program Example6;
        b : Double;
        c : Integer;
        d : String;
+       x : DOUBLE;
+       I : integer;
    Function F(p1 : Integer; Var p2 : char) : Integer;
      Begin
        f := c1;
@@ -31,4 +33,13 @@ Begin
      call p(c1);
      a(.2.), b := 5, 7.5;
      b,c,d := c,5,"hello";
+     DO 
+          WHILE I > 2 DO
+   	     BEGIN
+   		     DO x := 0 WHILE I > 2;
+    		     I := I + 1;
+    	     END
+     WHILE I < 10;
+     do x := 1 while x > 1; 
+     do x := 2 while 1;
 End.
