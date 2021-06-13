@@ -523,6 +523,13 @@ void compileWhileSt(void) {
   compileStatement();
 }
 
+void compileDoWhileSt(void){
+  eat(KW_DO);
+  compileStatement();
+  eat(KW_WHILE);
+  compileCondition();
+}
+
 void compileForSt(void) {
   // TODO: Check type consistency of FOR's variable
   Type *t1 = NULL;
