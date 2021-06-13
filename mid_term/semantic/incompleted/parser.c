@@ -200,7 +200,7 @@ void compileProcDecl(void) {
 }
 
 ConstantValue* compileUnsignedConstant(void) {
-  ConstantValue* constValue;
+  ConstantValue* constValue = NULL;
   Object* obj;
 
   switch (lookAhead->tokenType) {
@@ -265,7 +265,7 @@ ConstantValue* compileConstant(void) {
 }
 
 ConstantValue* compileConstant2(void) {
-  ConstantValue* constValue;
+  ConstantValue* constValue = NULL;
   Object* obj;
 
   switch (lookAhead->tokenType) {
@@ -295,7 +295,7 @@ ConstantValue* compileConstant2(void) {
 }
 
 Type* compileType(void) {
-  Type* type;
+  Type* type = NULL;
   Type* elementType;
   int arraySize;
   Object* obj;
@@ -342,7 +342,7 @@ Type* compileType(void) {
 }
 
 Type* compileBasicType(void) {
-  Type* type;
+  Type* type = NULL;
 
   switch (lookAhead->tokenType) {
   case KW_INTEGER: 
@@ -450,7 +450,7 @@ void compileStatement(void) {
 Type* compileLValue(void) {
   // TODO: parse a lvalue (a variable, an array element, a parameter, the current function identifier)
   Object* var;
-  Type* varType;
+  Type* varType = NULL;
 
   eat(TK_IDENT);
   // check if the identifier is a function identifier, or a variable identifier, or a parameter  
@@ -478,11 +478,43 @@ void compileAssignSt(void) {
   // TODO: parse the assignment and check type consistency
   Type *t1 = NULL;
   Type *t2 = NULL;
+  Type** t1List;
+  Type** t2List;
+  t1List = (Type** ) malloc(20 * sizeof(Type*));
+  t2List = (Type** ) malloc(20 * sizeof(Type*));
 
+  int count1 = 0;
   t1 = compileLValue();
+  t1List[count1++] = duplicateType(t1);
+  while(lookAhead->tokenType == SB_COMMA){
+    eat(SB_COMMA);
+    t1 = compileLValue();
+    t1List[count1++] = duplicateType(t1);
+  }
   eat(SB_ASSIGN);
+
+  int count2 = 0;
   t2 = compileExpression();
-  checkTypeEquality(t1, t2);
+  t2List[count2++] = duplicateType(t2); 
+  while(lookAhead->tokenType == SB_COMMA){
+    eat(SB_COMMA);
+    t2 = compileExpression();
+    t2List[count2++] = duplicateType(t2);
+  }
+
+  int count = 0;
+  if (count1 < count2){
+    error(ERR_MISSING_LVALUE, currentToken->lineNo, currentToken->colNo);
+  }
+  else if (count2 < count1){
+    error(ERR_MISSING_RVALUE, currentToken->lineNo, currentToken->colNo);
+  }
+  else{
+    do {
+      checkTypeEquality(t1List[count], t2List[count]);
+      count += 1;
+    } while (t1List[count] != NULL || t2List[count]!= NULL);
+  }
 }
 
 void compileCallSt(void) {
@@ -730,6 +762,7 @@ Type *compileExpression3(void) {
   default:
     error(ERR_INVALID_EXPRESSION, lookAhead->lineNo, lookAhead->colNo);
   }
+  return NULL;
 }
 
 Type* compileTerm(void) {
@@ -787,7 +820,7 @@ Type* compileFactor(void) {
   // TODO: parse a factor and return the factor's type
 
   Object* obj;
-  Type* type;
+  Type* type = NULL;
 
   switch (lookAhead->tokenType) {
   case TK_NUMBER:
