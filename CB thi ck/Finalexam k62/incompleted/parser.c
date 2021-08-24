@@ -436,13 +436,20 @@ void compileStatement(void) {
   case KW_DO:
     compileDoWhileSt();
     break;
+  case KW_SWITCH:
+    compileSwitchCaseSt();
+    break;
   case KW_FOR:
     compileForSt();
+    break;
+  case KW_BREAK:
+    compileBreakSt();
     break;
     // EmptySt needs to check FOLLOW tokens
   case SB_SEMICOLON:
   case KW_END:
   case KW_ELSE:
+  case KW_CASE:
     break;
     // Error occurs
   default:
@@ -573,6 +580,28 @@ void compileDoWhileSt(void){
   compileCondition();
 }
 
+void compileSwitchCaseSt(void){
+  eat(KW_SWITCH);
+  compileExpression();
+  eat(KW_BEGIN);
+  while(lookAhead->tokenType == KW_CASE){
+    eat(KW_CASE);
+    compileConstant();
+    eat(SB_COLON);
+    compileStatements();
+  }
+  if (lookAhead->tokenType == KW_DEFAULT){
+    eat(KW_DEFAULT);
+    eat(SB_COLON);
+    compileStatement();
+  }
+  eat(KW_END);
+}
+
+void compileBreakSt(void){
+  eat(KW_BREAK);
+}
+
 void compileForSt(void) {
   // TODO: Check type consistency of FOR's variable
   Type *type = NULL;
@@ -649,6 +678,7 @@ void compileArguments(ObjectNode* paramList) {
     // Check FOLLOW set 
   case SB_TIMES:
   case SB_SLASH:
+  case SB_POWER:
   case SB_PLUS:
   case SB_MINUS:
   case KW_TO:
@@ -785,6 +815,7 @@ Type *compileExpression3(void) {
   case SB_RSEL:
   case SB_SEMICOLON:
   case KW_END:
+  case KW_BEGIN:
   case KW_ELSE:
   case KW_THEN:
     return NULL;
@@ -818,9 +849,6 @@ Type* compileTerm2(void) {
   switch (lookAhead->tokenType) {
   case SB_TIMES:
     eat(SB_TIMES);
-    if(lookAhead->tokenType == SB_TIMES){
-      eat(SB_TIMES);
-    }
     type1 = compileFactor();
     checkNumberType(type1);
     type2 = compileTerm2();
@@ -835,6 +863,15 @@ Type* compileTerm2(void) {
     type2 = compileTerm2();
     if (type2 != NULL)
       return upcastType(type1, type2);
+    return type1;
+    break;
+  case SB_POWER:
+    eat(SB_POWER);
+    type1 = compileFactor();
+    checkNumberType(type1);
+    type2 = compileTerm2();
+    if (type2 != NULL)
+      return upcastType(type1,type2);
     return type1;
     break;
     // check the FOLLOW set
@@ -854,6 +891,7 @@ Type* compileTerm2(void) {
   case SB_RSEL:
   case SB_SEMICOLON:
   case KW_END:
+  case KW_BEGIN:
   case KW_ELSE:
   case KW_THEN:
     break;

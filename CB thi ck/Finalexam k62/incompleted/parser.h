@@ -43,6 +43,8 @@ void compileIfSt(void);
 void compileElseSt(void);
 void compileWhileSt(void);
 void compileDoWhileSt(void);
+void compileSwitchCaseSt(void);
+void compileBreakSt(void);
 void compileForSt(void);
 void compileArgument(Object* param);
 void compileArguments(ObjectNode* paramList);
@@ -54,6 +56,7 @@ Type* compileTerm(void);
 Type* compileTerm2(void);
 Type* compileFactor(void);
 Type* compileIndexes(Type* arrayType);
+
 
 int compile(char *fileName);
 

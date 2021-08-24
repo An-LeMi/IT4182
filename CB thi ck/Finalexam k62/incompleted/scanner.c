@@ -151,7 +151,7 @@ Token *readString(void){
   int count = 1;
   readChar();
   while(1){
-    if(count > MAX_IDENT_LEN){
+    if(count > MAX_STRING_LEN){
       error(ERR_IDENT_TOO_LONG, lineNo, colNo);
       return NULL;
     }
@@ -210,6 +210,10 @@ Token* getToken(void) {
     readChar();
     if ((charCodes[currentChar] == CHAR_RPAR) && (currentChar != EOF)){
       error(ERR_END_OF_COMMENT, ln, cn);
+    }
+    else if ((currentChar != EOF) && (charCodes[currentChar] == CHAR_TIMES)){
+      readChar();
+      return makeToken(SB_POWER, ln, cn);
     }
     else {
       return makeToken(SB_TIMES, ln, cn);
@@ -372,6 +376,10 @@ void printToken(Token *token) {
   case KW_DO: printf("KW_DO\n"); break;
   case KW_FOR: printf("KW_FOR\n"); break;
   case KW_TO: printf("KW_TO\n"); break;
+  case KW_SWITCH: printf("KW_SWITCH\n"); break;
+  case KW_CASE: printf("KW_CASE\n"); break;
+  case KW_DEFAULT: printf("KW_DEFAULT\n"); break;
+  case KW_BREAK: printf("KW_BREAK\n"); break;
   case KW_DOUBLE: printf("KW_DOUBLE\n"); break;
   case KW_STRING: printf("KW_STRING\n"); break;
 
@@ -394,6 +402,7 @@ void printToken(Token *token) {
   case SB_RPAR: printf("SB_RPAR\n"); break;
   case SB_LSEL: printf("SB_LSEL\n"); break;
   case SB_RSEL: printf("SB_RSEL\n"); break;
+  case SB_POWER: printf("SB_POWER\n"); break;
   }
 }
 
