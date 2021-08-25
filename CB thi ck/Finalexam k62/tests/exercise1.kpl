@@ -1,0 +1,14 @@
+PROGRAM EXERCISE1; (* Exercise 1 *)
+
+VAR N: INTEGER;
+    R: INTEGER;
+    I: INTEGER;
+
+BEGIN
+    N := READI;
+    R := 1;
+    FOR I:=0 TO N-1 DO
+        R := 2 * R; 
+    CALL WRITEI(R);
+
+END. (* Exercise 1 *)

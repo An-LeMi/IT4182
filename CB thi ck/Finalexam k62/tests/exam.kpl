@@ -1,0 +1,12 @@
+PROGRAM Exam;
+var n: DOUBLE;
+    s: STRING;
+
+Function F(n: DOUBLE; s: STRING) : STRING;
+    BEGIN
+        if n < 0 then F := " " else F := F(n-1, s) + F(n-1, s);
+    END;
+
+BEGIN
+    CALL WRITES( F(10.5, "hello"));
+END.
