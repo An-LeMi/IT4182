@@ -769,10 +769,13 @@ Type* compileExpression2(void) {
   type1 = compileTerm();
   type2 = compileExpression3();
 
-
   if (type2 == NULL) {
     return type1;
   }  
+  else if (type1->typeClass == TP_STRING || type2->typeClass == TP_STRING){
+    checkTypeEquality(type1, type2);
+    return type1;
+  }
   else {
     return upcastType(type1, type2);
   }
@@ -787,9 +790,15 @@ Type *compileExpression3(void) {
   case SB_PLUS:
     eat(SB_PLUS);
     type1 = compileTerm();
-    checkNumberType(type1);
+    checkPlus(type1);
     type2 = compileExpression3();
-    if (type2 != NULL)
+    if (type2 == NULL) {
+      return type1;
+    }
+    else if (type1->typeClass == TP_STRING || type2->typeClass == TP_STRING) {
+      checkTypeEquality(type1, type2);
+    }
+    else
       return upcastType(type1, type2);
     break;
   case SB_MINUS:
@@ -834,7 +843,7 @@ Type* compileTerm(void) {
 
   type1 = compileFactor();
   type2 = compileTerm2();
-  if (type2 != NULL){
+  if (type2 != NULL) {
       return upcastType(type1,type2);
   }
   return type1;

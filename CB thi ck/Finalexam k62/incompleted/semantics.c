@@ -142,6 +142,15 @@ void checkNumberType(Type* type) {
    error (ERR_TYPE_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
 }
 
+void checkPlus(Type* type) {
+  // TODO
+  if ((type != NULL) && ((type->typeClass == TP_DOUBLE) || (type->typeClass == TP_INT) || (type->typeClass == TP_STRING))){
+    return;
+  }
+  else
+   error (ERR_TYPE_INCONSISTENCY, currentToken->lineNo, currentToken->colNo);
+}
+
 void checkStringType(Type* type) {
   // TODO
   if (type != NULL && type->typeClass == TP_STRING){

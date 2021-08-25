@@ -72,7 +72,8 @@ int compareType(Type* type1, Type* type2) {
       if (type1->arraySize == type2->arraySize)
 	      return compareType(type1->elementType, type2->elementType);
       else return 0;
-    } else return 1;
+    } 
+    else return 1;
   }  
   else return 0;
 }

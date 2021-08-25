@@ -25,6 +25,7 @@ void checkDoubleType(Type* type);
 void checkNumberType(Type* type);
 void checkStringType(Type* type);
 void checkBasicType(Type* type);
+void checkPlus(Type* type);
 void checkTypeEquality(Type* type1, Type* type2);
 Type *upcastType(Type *type1, Type *type2);
 
