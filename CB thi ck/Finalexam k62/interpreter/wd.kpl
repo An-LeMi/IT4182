@@ -1,0 +1,13 @@
+PROGRAM wd;
+var d: INTEGER;
+function wd(i:INTEGER): char;
+    BEGIN
+        if i = 1 then wd:='C'
+        else if i=2 then wd:='H'
+        else if i=3 then wd:='B'
+        else wd:='A';
+    END;
+BEGIN
+    d:=READI;
+    CALL WRITEC(wd(d))
+END.

@@ -1,0 +1,13 @@
+PROGRAM ex1;
+var ch: char;
+    I: char;
+function cv(ch:char):char;
+    Begin
+        if ch='A'then cv:='C'
+        else if ch='B' then cv:='C'
+        else cv:='V'
+    END;
+BEGIN
+    FOR I:='A' to 'Z' DO    
+        CALL WRITEC(cv(I))
+END.

@@ -1,0 +1,18 @@
+Program matrix;
+Var N: Integer;
+	A: Array(.20.) of Array(.20.) of Integer;
+	I: Integer;
+	J: Integer;
+	Check: Integer;
+
+Begin
+	N := ReadI;
+	Check := 1;
+	For I:=0 to N-1 do
+		For J:=0 to N-1 do
+			A(.I.)(.J.) := ReadI;
+	For I:=1 to N-1 do
+		For J:=I to N-1 do
+			if A(.I.)(.J.) != 0 then check := 0;
+	Call WriteI(Check);
+End.
