@@ -1,0 +1,17 @@
+PROGRAM Example9; (* Example 9 *)
+VAR I : INTEGER;
+    A : INTEGER;
+    B : STRING;
+    C: INTEGER;
+BEGIN
+I := 10 + 2;
+A := I * 2;
+
+REPEAT
+    A := A * 2
+UNTIL A > 100;
+
+A ::= IF A > 0 RETURN A ELSE RETURN -A;
+
+
+END. (* Example 9 *)
